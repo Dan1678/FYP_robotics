@@ -17,6 +17,6 @@
 - `Pillow` == 11.0.0
 - `matplotlib` == 3.8.0
 
-### External Repositories
+### External Repositories (SAM2 should be cloned into project root)
 - `clip` – [OpenAI CLIP](https://github.com/openai/CLIP)
 - `SAM2` – [FacebookResearch SAM2](https://github.com/facebookresearch/sam2
