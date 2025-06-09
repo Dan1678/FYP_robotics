@@ -36,5 +36,5 @@ This repository implements a closed-loop multi-robot pick-and-place pipeline dri
 - `matplotlib` == 3.8.0
 
 ### External Repositories (SAM2 should be cloned into project root)
-- `clip` – [OpenAI CLIP](https://github.com/openai/CLIP)
-- `SAM2` – [FacebookResearch SAM2](https://github.com/facebookresearch/sam2
+- `clip` – (https://github.com/openai/CLIP)
+- `SAM2` – (https://github.com/facebookresearch/sam2
