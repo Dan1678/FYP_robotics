@@ -18,7 +18,7 @@ This repository implements a closed-loop multi-robot pick-and-place pipeline dri
 - Dual-robot (`dual_robot_system.py`)
 
 
-##Dependencies
+## Dependencies
 
 ### Standard Library (built-in)
 - `socket`
