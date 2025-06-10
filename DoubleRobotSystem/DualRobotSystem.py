@@ -12,6 +12,7 @@ from Planning.gpt_functions import extract_task_objects, generate_open_verificat
 from Perception.segmentation_layer import perform_segmentation, encode_and_match
 from Execution.client_script import send_command_to_robot
 from Mapping import image_to_robo_mapping
+from Planning.gpt_functions import generate_camera_commands
 
 
 '''
@@ -148,6 +149,36 @@ def verify_bin_scene(task_objects, device):
     print(f"[Verifier] Bin confidences: {bin_confidences}")
     return bin_confidences, bin_poses
 
+def control_camera_llm(task_stage: str, task_desc: str, task_objects: list):
+    """
+    Use LLM to generate and execute camera robot commands for a given stage.
+    task_stage: a short description (e.g., 'initial', 'post_worker', 'bin_verification')
+    """
+    # Build a stage-specific detail for the camera
+    details = f"Stage: {task_stage}. Task: {task_desc}"  
+    cmds = generate_camera_commands(details, task_objects)
+    
+    print(f"\n[Camera LLM] Generated commands for {task_stage}:")
+    for cmd in cmds:
+        print(f"  - {cmd}")
+    
+    for cmd in cmds:
+        cmd = cmd.strip().lower()
+        if cmd == "home()":
+            print("[Camera LLM] Moving to home position")
+            send_vision_command("home")
+        elif cmd == "bins()":
+            print("[Camera LLM] Moving to bin view")
+            send_vision_command("bins")
+        elif cmd == "image()":
+            print("[Camera LLM] Capturing image")
+            perform_segmentation()  # Capture happens on central PC
+        elif cmd.startswith("segment_clip("):
+            print("[Camera LLM] Segmenting and clipping image")
+            # Extract target objects from command if possible
+            perform_segmentation()  # Segmentation happens on central PC
+        else:
+            print(f"[Camera LLM] Ignoring unknown command: {cmd}")
 
 def main():
     # 1) Ensure camera starts over the table
@@ -195,6 +226,18 @@ def main():
     print("\n[Verifier] Moving camera to bin-view…")
     send_vision_command("bins")
     bin_confidences, bin_poses = verify_bin_scene(task_objs, device)
+
+
+    # # 5) LLM-controlled table-view verification
+    # print("\n[Verifier] Using LLM for table-view verification...")
+    # control_camera_llm("table_verification", task_desc, task_objs)
+    # table_confidences, table_poses = verify_table_scene(task_objs, device, mapping)
+
+    # # 6) LLM-controlled bin-view verification
+    # print("\n[Verifier] Using LLM for bin-view verification...")
+    # control_camera_llm("bin_verification", task_desc, task_objs)
+    # bin_confidences, bin_poses = verify_bin_scene(task_objs, device)
+
 
     # 7) Build the GPT verification prompt
     prompt = generate_open_verification_prompt(
